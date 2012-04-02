@@ -293,7 +293,7 @@ def package_webapp(options):
 
 @task
 @needs(
-    'build',
+    #'build',
     'package_geoserver',
     'package_geonetwork',
     'package_webapp',

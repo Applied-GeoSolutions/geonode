@@ -1126,7 +1126,8 @@ class Layer(models.Model, PermissionLevelMixin):
             onlineresources = [r for r in meta.distribution.online if r.protocol == "WWW:LINK-1.0-http--link"]
             if len(onlineresources) == 1:
                 res = onlineresources[0]
-                self.distribution_url = res.url
+		# store relative rather than absolute URL
+                self.distribution_url = urlparse(res.url).path
                 self.distribution_description = res.description
 
     def keyword_list(self):

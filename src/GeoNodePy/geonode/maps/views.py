@@ -1311,7 +1311,8 @@ def _build_search_result(doc):
     result['uuid'] = rec.identifier
     result['abstract'] = rec.abstract
     result['keywords'] = [x for x in rec.subjects if x]
-    result['detail'] = rec.uri or ''
+    # return relative rather then absolute URL
+    result['detail'] = urlparse(rec.uri).path or ''
 
     # XXX needs indexing ? how
     result['attribution'] = {'title': '', 'href': ''}

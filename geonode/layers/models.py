@@ -136,6 +136,38 @@ class Layer(ResourceBase):
 
         return ogc_server_settings.LOCATION + "wms/reflect?" + p
 
+    def dynamic_model(self):
+        from django.contrib.gis.db import models as GISmodels
+        # Determine source of data from geoserver
+        if self.service_type != 'WFS':
+            raise GeoNodeException("layer not of type WFS")
+
+        # Create dynamic attributes
+        class Meta:
+            db_table = self.name
+            managed = False
+
+        attrs = {
+            'database': 'datastore',
+            'ogc_fid': GISmodels.AutoField(primary_key=True),
+            'objects': GISmodels.GeoManager(),
+            '__module__': 'geonode.layers.models',
+            'Meta': Meta
+        }
+
+        for a in self.attribute_set.all():
+            t = a.attribute_type[4:]
+            if t == 'string':
+                fieldtype = models.CharField()
+            elif t == 'int':
+                fieldtype = models.IntegerField()
+            elif t == 'double':
+                fieldtype = models.DecimalField()
+            elif t == 'MultiPolygonPropertyType':
+                fieldtype = GISmodels.MultiPolygonField()
+            attrs.update({a.attribute: fieldtype})
+
+        return type(str(self.name), (GISmodels.Model,), attrs)
 
     def verify(self):
         """Makes sure the state of the layer is consistent in GeoServer and Catalogue.

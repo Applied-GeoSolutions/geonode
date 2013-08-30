@@ -144,30 +144,30 @@ class Layer(ResourceBase):
 
         # Create dynamic attributes
         class Meta:
-            db_table = self.name
+            db_table = '"vmrv"."'+str(self.name)+'"'
             managed = False
 
         attrs = {
-            'database': 'datastore',
-            'ogc_fid': GISmodels.AutoField(primary_key=True),
+            'database': 'geodata',
+            'ogc_fid': models.AutoField(primary_key=True),
             'objects': GISmodels.GeoManager(),
-            '__module__': 'geonode.layers.models',
-            'Meta': Meta
+            '__module__': 'geonode.layers',
+            'Meta': Meta,
         }
-
+        
         for a in self.attribute_set.all():
             t = a.attribute_type[4:]
             if t == 'string':
-                fieldtype = models.CharField()
+                fieldtype = GISmodels.CharField(max_length=255, default="", blank=True)
             elif t == 'int':
-                fieldtype = models.IntegerField()
+                fieldtype = GISmodels.IntegerField()
             elif t == 'double':
-                fieldtype = models.DecimalField()
+                fieldtype = GISmodels.FloatField()
             elif t == 'MultiPolygonPropertyType':
                 fieldtype = GISmodels.MultiPolygonField()
-            attrs.update({a.attribute: fieldtype})
-
-        return type(str(self.name), (GISmodels.Model,), attrs)
+            attrs.update({str(a.attribute): GISmodels.CharField(max_length=255, blank=True)})
+        mod = type(str(self.name), (GISmodels.Model,), attrs)
+        return mod
 
     def verify(self):
         """Makes sure the state of the layer is consistent in GeoServer and Catalogue.

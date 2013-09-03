@@ -149,7 +149,7 @@ class Layer(ResourceBase):
 
         attrs = {
             'database': 'geodata',
-            'ogc_fid': models.AutoField(primary_key=True),
+            'id': models.AutoField(primary_key=True, db_column='ogc_fid'),
             'objects': GISmodels.GeoManager(),
             '__module__': 'geonode.layers',
             'Meta': Meta,
@@ -165,7 +165,7 @@ class Layer(ResourceBase):
                 fieldtype = GISmodels.FloatField()
             elif t == 'MultiPolygonPropertyType':
                 fieldtype = GISmodels.MultiPolygonField()
-            attrs.update({str(a.attribute): GISmodels.CharField(max_length=255, blank=True)})
+            attrs[str(a.attribute)] = fieldtype
         mod = type(str(self.name), (GISmodels.Model,), attrs)
         return mod
 

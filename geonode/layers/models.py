@@ -138,6 +138,7 @@ class Layer(ResourceBase):
 
     def dynamic_model(self):
         from django.contrib.gis.db import models as GISmodels
+        from copy import copy
         # Determine source of data from geoserver
         if self.service_type != 'WFS':
             raise GeoNodeException("layer not of type WFS")
@@ -154,18 +155,25 @@ class Layer(ResourceBase):
             '__module__': 'geonode.layers',
             'Meta': Meta,
         }
-        
+
+        type_map = {
+            'string': GISmodels.CharField(max_length=255, default="", blank=True),
+            'int': GISmodels.IntegerField(),
+            'double': GISmodels.FloatField(),
+            'PointPropertyType': GISmodels.PointField(),
+            'LineStringPropertyType': GISmodels.LineStringField(),
+            'PolygonPropertyType': GISmodels.PolygonField(),
+            'MultiPointPropertyType': GISmodels.MultiPointField(),
+            'MultiLineStringPropertyType': GISmodels.MultiLineStringField(),
+            'MultiPolygonPropertyType': GISmodels.MultiPolygonField()
+        }
+
         for a in self.attribute_set.all():
             t = a.attribute_type[4:]
-            if t == 'string':
-                fieldtype = GISmodels.CharField(max_length=255, default="", blank=True)
-            elif t == 'int':
-                fieldtype = GISmodels.IntegerField()
-            elif t == 'double':
-                fieldtype = GISmodels.FloatField()
-            elif t == 'MultiPolygonPropertyType':
-                fieldtype = GISmodels.MultiPolygonField()
-            attrs[str(a.attribute)] = fieldtype
+            try:
+                attrs[str(a.attribute)] = copy(type_map[t])
+            except:
+                pass
         mod = type(str(self.name), (GISmodels.Model,), attrs)
         return mod
 

@@ -137,6 +137,8 @@ class Layer(ResourceBase):
         return ogc_server_settings.LOCATION + "wms/reflect?" + p
 
     def dynamic_model(self):
+        """ Generate a model representing the layer """
+
         from django.contrib.gis.db import models as GISmodels
         from copy import copy
         # Determine source of data from geoserver
@@ -174,8 +176,8 @@ class Layer(ResourceBase):
                 attrs[str(a.attribute)] = copy(type_map[t])
             except:
                 pass
-        mod = type(str(self.name), (GISmodels.Model,), attrs)
-        return mod
+        model = type(str(self.name), (GISmodels.Model,), attrs)
+        return model
 
     def verify(self):
         """Makes sure the state of the layer is consistent in GeoServer and Catalogue.

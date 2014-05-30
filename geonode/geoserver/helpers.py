@@ -264,16 +264,16 @@ def cascading_delete(cat, layer_name):
             delete_from_postgis(resource_name)
 
         # Prevent the entire store from being removed when the store is a GeoGIT repository.
-        if store.type and store.type.lower() == 'geogit':
-            return
+        #if store.type and store.type.lower() == 'geogit':
+        #    return
 
-        else:
-            try:
-                cat.delete(store, recurse=True)
-            except FailedRequestError as e:
+        #else:
+        #    try:
+        #        cat.delete(store, recurse=True)
+        #    except FailedRequestError as e:
                 # Trying to delete a shared store will fail 
                 # We'll catch the exception and log it.
-                logger.debug(e) 
+        #        logger.debug(e) 
 
 
 def delete_from_postgis(resource_name):

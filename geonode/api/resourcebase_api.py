@@ -11,6 +11,7 @@ from .authorization import GeoNodeAuthorization
 
 from .api import TagResource, TopicCategoryResource, UserResource, FILTER_TYPES
 
+from django.conf import settings
 from django.db.models import Q
 
 FILTER_TYPES.update({
@@ -73,6 +74,12 @@ class CommonModelApi(ModelResource):
                         filtered = semi_filtered.instance_of(FILTER_TYPES[the_type])
         else:
             filtered = semi_filtered
+
+        try:
+            lyr = Layer.objects.get(typename=settings.SITE_VECTOR)
+            filtered = self.filter_bbox(filtered, [lyr.bbox_x0, lyr.bbox_y0, lyr.bbox_x1, lyr.bbox_y1])
+        except Exception, e:
+            pass
 
         if extent:
             filtered = self.filter_bbox(filtered, extent)

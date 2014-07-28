@@ -100,6 +100,12 @@ class CommonModelApi(ModelResource):
         else:
             filtered = semi_filtered
 
+        try:
+            lyr = Layer.objects.get(typename=settings.SITE_VECTOR)
+            filtered = self.filter_bbox(filtered, '%s,%s,%s,%s' % (lyr.bbox_x0, lyr.bbox_y0, lyr.bbox_x1, lyr.bbox_y1))
+        except Exception, e:
+            pass
+
         if extent:
             filtered = self.filter_bbox(filtered, extent)
         return filtered

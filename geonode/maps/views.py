@@ -118,8 +118,8 @@ def map_detail(request, mapid, snapshot=None, template='maps/map_detail.html'):
     '''
     map_obj = _resolve_map(request, mapid, 'base.view_resourcebase', _PERMISSION_MSG_VIEW)
 
-    map_obj.popular_count += 1
-    map_obj.save()
+    #map_obj.popular_count += 1
+    #map_obj.save()
 
     if snapshot is None:
         config = map_obj.viewer_json(request.user)
